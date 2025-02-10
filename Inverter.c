@@ -11,7 +11,7 @@ int main(int argc, char** argv)
     char inputFilename[] = "testImage.jpg";
     char outputFilename[] = "invert.jpg";
     
-    if(argc ==2) 
+    if(atoi(argv[1]) == 0)
     {
          // load data from file
         printf("Reading %s...\n",argv[1]);
@@ -26,16 +26,25 @@ int main(int argc, char** argv)
     
     printf("Size of the image is %dx%d\n", width, height);
 
-    // invert values
-    unsigned long _begin = getTimestamp();
-    int nbPixels = width * height * depth;
-    for(unsigned int i = 0; i < nbPixels; i++)
-    {
-        data[i] = 255 - data[i];
+    if(atoi(argv[1]) != 0){
+        printf("%d my number of threads \n",atoi(argv[1]));
+        //Thread needs parameter
+        // startIndex endIndex mutex data
+        
     }
-    unsigned long _end = getTimestamp();
-    printf("Elapsed time... %lu us\n", _end - _begin);
-    
+    else{
+        // invert values
+        unsigned long _begin = getTimestamp();
+        printf("Started at %lu \n",_begin);
+        int nbPixels = width * height * depth;
+        for(unsigned int i = 0; i < nbPixels; i++)
+        {
+            data[i] = 255 - data[i];
+        }
+        unsigned long _end = getTimestamp();
+        printf("Elapsed time... %lu us\n", _end - _begin);
+    }
+
     printf("Writing %s...\n", outputFilename);
     // save data file
     stbi_write_png(outputFilename, width, height, depth, data, 0);

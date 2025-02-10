@@ -11,7 +11,7 @@ Image
     -- ar -rv libstb.a stb_image.o stb_image_write.o
 
 3. Build Image inverter
-    -- gcc Inverter.cc -L. -ltime -lstb -lm -o Inverter
+    -- gcc Inverter.c -L. -ltime -lstb -lm -o Inverter
 
 4. Test Image inverter
     -- ./Inverter
