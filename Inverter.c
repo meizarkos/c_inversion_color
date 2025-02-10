@@ -1,11 +1,20 @@
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 #include "measureTime.h"
 #include "stb_image.h"
 #include "stb_image_write.h"
 
+typedef struct{
+    int startIndex;
+    int endIndex;
+    unsigned char* data;
+    pthread_mutex_t* mux;
+}pixelModifier;
+
 int main(int argc, char** argv)
 {
+    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
     unsigned char* data;
     int width, height, depth = 3;
     char inputFilename[] = "testImage.jpg";
@@ -30,7 +39,7 @@ int main(int argc, char** argv)
         printf("%d my number of threads \n",atoi(argv[1]));
         //Thread needs parameter
         // startIndex endIndex mutex data
-        
+
     }
     else{
         // invert values
