@@ -9,20 +9,26 @@ typedef struct{
     int startIndex;
     int endIndex;
     unsigned char* data;
-    pthread_mutex_t* mux;
-}pixelModifier;
+}threadData;
+
+void* invertPixel(void* arg){
+    threadData* ctx = (threadData*)arg;
+    for(int i=ctx->startIndex;i<ctx->endIndex;i++){
+        ctx->data[i] = 255 - ctx->data[i];
+    }
+    return NULL;
+}
 
 int main(int argc, char** argv)
 {
-    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
     unsigned char* data;
     int width, height, depth = 3;
     char inputFilename[] = "testImage.jpg";
     char outputFilename[] = "invert.jpg";
-    
-    if(atoi(argv[1]) == 0)
+
+    if(argc == 2 && atoi(argv[1])==0)
     {
-         // load data from file
+        // load data from file
         printf("Reading %s...\n",argv[1]);
         data = stbi_load(argv[1], &width, &height, NULL, depth);
     }
@@ -35,24 +41,29 @@ int main(int argc, char** argv)
     
     printf("Size of the image is %dx%d\n", width, height);
 
-    if(atoi(argv[1]) != 0){
-        printf("%d my number of threads \n",atoi(argv[1]));
-        //Thread needs parameter
-        // startIndex endIndex mutex data
+    int numberOfThread = atoi(argv[1]);
+    if(numberOfThread == 0){
+        numberOfThread = 1;
+    }
+    printf("%d my number of threads \n\n",numberOfThread);
+    unsigned long _begin = getTimestamp();
+    printf("Start %lu \n",_begin);
+    threadData threadData[numberOfThread];
+    pthread_t threads[numberOfThread];
+    int nbPixels = width * height * depth;
+    int pixelPerThread = nbPixels / numberOfThread;
+    for(int i = 0; i < numberOfThread ; i++){
+        threadData[i].startIndex = i * pixelPerThread;
+        threadData[i].endIndex = (i == numberOfThread - 1) ? nbPixels : (i + 1) * pixelPerThread;
+        threadData[i].data = data;
+        pthread_create(&threads[i], NULL, invertPixel, &threadData[i]);
+    }
 
+    for(int i = 0; i < numberOfThread; i++){
+        pthread_join(threads[i], NULL);
     }
-    else{
-        // invert values
-        unsigned long _begin = getTimestamp();
-        printf("Started at %lu \n",_begin);
-        int nbPixels = width * height * depth;
-        for(unsigned int i = 0; i < nbPixels; i++)
-        {
-            data[i] = 255 - data[i];
-        }
-        unsigned long _end = getTimestamp();
-        printf("Elapsed time... %lu us\n", _end - _begin);
-    }
+    unsigned long _end = getTimestamp();
+    printf("Elapsed time... %lu us\n", _end - _begin);
 
     printf("Writing %s...\n", outputFilename);
     // save data file
