@@ -26,20 +26,24 @@ int main(int argc, char** argv)
     char inputFilename[] = "testImage.jpg";
     char outputFilename[] = "invert.jpg";
 
-    if(argc == 2 && atoi(argv[1])==0)
+    if(argc > 2)
     {
         // load data from file
-        printf("Reading %s...\n",argv[1]);
-        data = stbi_load(argv[1], &width, &height, NULL, depth);
+        printf("Reading %s...\n",argv[2]);
+        data = stbi_load(argv[2], &width, &height, NULL, depth);
     }
     else
     {
         // load data from file
-        printf("Reading %s...\n",inputFilename);
+        printf("Reading default config %s...\n",inputFilename);
         data = stbi_load(inputFilename, &width, &height, NULL, depth);
     }
     
     printf("Size of the image is %dx%d\n", width, height);
+    if(argc == 1){
+        printf("Please enter a number of threads, it should be ./Inverter number_of_thread image_to_invert\n");
+        return 1;
+    }
 
     int numberOfThread = atoi(argv[1]);
     if(numberOfThread == 0){
